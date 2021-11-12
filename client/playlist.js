@@ -1,13 +1,13 @@
 'use strict';
 
 var Playlist = {
-  getMedias: function() {
+  getMedias: function () {
     var url = new URL('https://api.wistia.com/v1/medias.json');
     url.searchParams.set('api_password', TOKEN);
     return axios.get(String(url));
   },
 
-  renderMedia: function(media) {
+  renderMedia: function (media) {
     var template = document.getElementById('media-template');
     var clone = template.content.cloneNode(true);
     var el = clone.children[0];
@@ -21,14 +21,32 @@ var Playlist = {
     );
 
     document.getElementById('medias').appendChild(el);
-  }
+  },
 };
 
-(function() {
+window.wistiaInit = function (W) {
+  window._wq = window._wq || [];
+  _wq.push({
+    id: 'current_video',
+    options: {
+      playlistLinks: 'auto',
+      silentAutoPlay: true,
+      autoPlay: true,
+      plugin: {
+        'autoplay-countdown': {
+          src: './autoplay-countdown.js',
+          from: 5,
+        },
+      },
+    },
+  });
+};
+
+(function () {
   document.addEventListener(
     'DOMContentLoaded',
-    function() {
-      Playlist.getMedias().then(function(response) {
+    function () {
+      Playlist.getMedias().then(function (response) {
         var medias = response.data;
         if (!medias) {
           return;
@@ -38,7 +56,7 @@ var Playlist = {
           .querySelector('.wistia_embed')
           .classList.add('wistia_async_' + medias[0].hashed_id);
 
-        medias.forEach(function(media) {
+        medias.forEach(function (media) {
           Playlist.renderMedia(media);
         });
       });

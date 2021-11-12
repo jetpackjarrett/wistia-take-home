@@ -19,11 +19,6 @@ header {
   padding: 0 60px;
 }
 
-.thumbnail {
-  height: 56px;
-  margin-right: 12px;
-}
-
 .wistia_embed {
   margin-right: 48px;
 }
@@ -58,4 +53,33 @@ header {
   flex-direction: column;
   justify-content: center;
   font-size: 240%;
+}
+
+.thumbnail-container {
+  margin-right: 12px;
+  position: relative;
+  line-height: 56px;
+  height: 56px;
+}
+
+.currently-played .thumbnail-container::before {
+  background-color: rgba(0, 0, 0, 0.5);
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  content: 'Playing';
+  text-align: center;
+  flex-direction: column;
+  justify-content: center;
+  color: white;
+  font-size: 80%;
+  font-weight: bold;
+  line-height: 56px;
+  height: 56px;
+}
+
+.thumbnail {
+  height: 56px;
 }

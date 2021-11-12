@@ -1,64 +1,80 @@
 'use strict';
 
-var Playlist = {
-  getMedias: function () {
-    var url = new URL('https://api.wistia.com/v1/medias.json');
-    url.searchParams.set('api_password', TOKEN);
-    return axios.get(String(url));
-  },
+import { TOKEN, formatTime } from './common.js';
 
-  renderMedia: function (media) {
-    var template = document.getElementById('media-template');
-    var clone = template.content.cloneNode(true);
-    var el = clone.children[0];
+class Playlist {
+  constructor() {
+    this.medias = [];
+  }
+
+  getMedias() {
+    const url = new URL('https://api.wistia.com/v1/medias.json');
+    url.searchParams.set('api_password', TOKEN);
+    return fetch(String(url))
+      .then((res) => {
+        if (res.ok) {
+          return res.json();
+        }
+      })
+      .then((json) => {
+        this.medias = json;
+        return this.medias;
+      });
+  }
+
+  renderMedias() {
+    this.medias.forEach(this.renderMedia);
+  }
+
+  renderMedia(media) {
+    const template = document.getElementById('media-template');
+    const clone = template.content.cloneNode(true);
+    const el = clone.children[0];
 
     el.querySelector('.thumbnail').setAttribute('src', media.thumbnail.url);
     el.querySelector('.title').innerText = media.name;
-    el.querySelector('.duration').innerText = Utils.formatTime(media.duration);
+    el.querySelector('.duration').innerText = formatTime(media.duration);
     el.querySelector('.media-content').setAttribute(
       'href',
-      '#wistia_' + media.hashed_id
+      `#wistia_${media.hashed_id}`
     );
 
     document.getElementById('medias').appendChild(el);
-  },
-};
+  }
+}
 
 (function () {
   document.addEventListener(
     'DOMContentLoaded',
-    function () {
-      Playlist.getMedias().then(function (response) {
-        var medias = response.data;
-        if (!medias) {
-          return;
-        }
+    async function () {
+      const playlist = new Playlist();
+      const medias = await playlist.getMedias();
 
-        window._wq = window._wq || [];
-        _wq.push({
-          id: 'current_video',
-          options: {
-            playlistLinks: 'auto',
-            silentAutoPlay: true,
-            autoPlay: true,
-            plugin: {
-              'autoplay-countdown': {
-                medias,
-                src: './autoplay-countdown.js',
-                from: 5,
-              },
+      window._wq = window._wq || [];
+      _wq.push({
+        id: 'current_video',
+        options: {
+          playlistLinks: 'auto',
+          silentAutoPlay: true,
+          autoPlay: true,
+          plugin: {
+            'autoplay-countdown': {
+              medias,
+              src: './plugins/autoplay-countdown.js',
+              from: 5,
+            },
+            'highlight-current': {
+              src: './plugins/highlight-current.js',
             },
           },
-        });
-
-        document
-          .querySelector('.wistia_embed')
-          .classList.add('wistia_async_' + medias[0].hashed_id);
-
-        medias.forEach(function (media) {
-          Playlist.renderMedia(media);
-        });
+        },
       });
+
+      document
+        .querySelector('.wistia_embed')
+        .classList.add('wistia_async_' + playlist.medias[0].hashed_id);
+
+      playlist.renderMedias();
     },
     false
   );

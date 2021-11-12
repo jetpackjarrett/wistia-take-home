@@ -41,6 +41,32 @@ class Playlist {
 
     document.getElementById('medias').appendChild(el);
   }
+
+  setCurrent(video) {
+    const currentIndex = this.medias.findIndex((media) => {
+      return media.hashed_id === video.hashedId();
+    });
+    this.medias[currentIndex]._played = true;
+
+    const link = document.querySelector(`[href="#wistia_${video.hashedId()}"]`);
+
+    Array.from(document.querySelectorAll('.currently-played')).forEach((el) => {
+      if (el !== link) {
+        el.classList.remove('currently-played');
+      }
+    });
+
+    if (link) {
+      link.classList.add('currently-played');
+    }
+  }
+
+  playNext(video) {
+    const unplayedMedias = this.medias.filter((media) => !media._played);
+    if (unplayedMedias.length > 0) {
+      video.replaceWith(unplayedMedias[0].hashed_id);
+    }
+  }
 }
 
 (function () {
@@ -53,8 +79,24 @@ class Playlist {
       window._wq = window._wq || [];
       _wq.push({
         id: 'current_video',
+        onReady(video) {
+          playlist.setCurrent(video);
+
+          video.bind('end', () => {
+            playlist.playNext(video);
+          });
+
+          video.bind('beforereplace', () => {
+            const currentMedia = document
+              .querySelector(`[href="#wistia_${video.hashedId()}"]`)
+              .closest('li');
+            document.getElementById('medias').removeChild(currentMedia);
+            document.getElementById('medias').appendChild(currentMedia);
+            return video.unbind;
+          });
+        },
         options: {
-          playlistLinks: 'auto',
+          // playlistLinks: 'auto',
           silentAutoPlay: true,
           autoPlay: true,
           plugin: {

@@ -24,24 +24,6 @@ var Playlist = {
   },
 };
 
-window.wistiaInit = function (W) {
-  window._wq = window._wq || [];
-  _wq.push({
-    id: 'current_video',
-    options: {
-      playlistLinks: 'auto',
-      silentAutoPlay: true,
-      autoPlay: true,
-      plugin: {
-        'autoplay-countdown': {
-          src: './autoplay-countdown.js',
-          from: 5,
-        },
-      },
-    },
-  });
-};
-
 (function () {
   document.addEventListener(
     'DOMContentLoaded',
@@ -51,6 +33,23 @@ window.wistiaInit = function (W) {
         if (!medias) {
           return;
         }
+
+        window._wq = window._wq || [];
+        _wq.push({
+          id: 'current_video',
+          options: {
+            playlistLinks: 'auto',
+            silentAutoPlay: true,
+            autoPlay: true,
+            plugin: {
+              'autoplay-countdown': {
+                medias,
+                src: './autoplay-countdown.js',
+                from: 5,
+              },
+            },
+          },
+        });
 
         document
           .querySelector('.wistia_embed')

@@ -80,6 +80,10 @@ header {
   height: 56px;
 }
 
+.played {
+  opacity: 0.5;
+}
+
 .thumbnail {
   height: 56px;
 }

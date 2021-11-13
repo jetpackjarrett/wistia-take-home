@@ -4,6 +4,7 @@ import { TOKEN, formatTime } from './common.js';
 
 class Playlist {
   constructor() {
+    this.container = document.getElementById('medias');
     this.medias = [];
   }
 
@@ -52,7 +53,7 @@ class Playlist {
 
     Array.from(document.querySelectorAll('.currently-played')).forEach((el) => {
       if (el !== link) {
-        el.classList.remove('currently-played');
+        el.classList.replace('currently-played', 'played');
       }
     });
 
@@ -64,7 +65,20 @@ class Playlist {
   playNext(video) {
     const unplayedMedias = this.medias.filter((media) => !media._played);
     if (unplayedMedias.length > 0) {
-      video.replaceWith(unplayedMedias[0].hashed_id);
+      // video.replaceWith(unplayedMedias[0].hashed_id);
+    }
+  }
+
+  markPlayed(video) {
+    const currentMedia = document
+      .querySelector(`[href="#wistia_${video.hashedId()}"]`)
+      .closest('li');
+
+    // move played media to the bottom of the list unless its already played
+    if (!currentMedia.classList.contains('played')) {
+      this.container.removeChild(currentMedia);
+      currentMedia.classList.add('played');
+      this.container.appendChild(currentMedia);
     }
   }
 }
@@ -87,16 +101,12 @@ class Playlist {
           });
 
           video.bind('beforereplace', () => {
-            const currentMedia = document
-              .querySelector(`[href="#wistia_${video.hashedId()}"]`)
-              .closest('li');
-            document.getElementById('medias').removeChild(currentMedia);
-            document.getElementById('medias').appendChild(currentMedia);
+            playlist.markPlayed(video);
             return video.unbind;
           });
         },
         options: {
-          // playlistLinks: 'auto',
+          playlistLinks: 'auto',
           silentAutoPlay: true,
           autoPlay: true,
           plugin: {

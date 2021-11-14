@@ -24,6 +24,9 @@ class Playlist {
 
   renderMedias() {
     this.medias.forEach(this.renderMedia);
+    document
+      .querySelector('.wistia_embed')
+      .classList.add('wistia_async_' + this.medias[0].hashed_id);
   }
 
   renderMedia(media) {
@@ -49,7 +52,7 @@ class Playlist {
     async function () {
       const playlist = new Playlist();
       await playlist.fetchMedias();
-      let _init = false;
+
       window._wq = window._wq || [];
       _wq.push({
         id: 'current_video',
@@ -66,10 +69,6 @@ class Playlist {
           },
         },
       });
-
-      document
-        .querySelector('.wistia_embed')
-        .classList.add('wistia_async_' + playlist.medias[0].hashed_id);
 
       playlist.renderMedias();
     },

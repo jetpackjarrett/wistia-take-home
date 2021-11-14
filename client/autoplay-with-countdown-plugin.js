@@ -14,21 +14,21 @@ function highlightCurrent(video) {
   }
 }
 
-_WISTIA_AUTOPLAYED = [];
+_WISTIA_AUTOPLAYED = new Set();
 
 Wistia.plugin('autoplay-with-countdown', (video, { medias, from }) => {
   highlightCurrent(video);
 
-  const endTime = video.duration();
-  _WISTIA_AUTOPLAYED.push(video.hashedId());
+  _WISTIA_AUTOPLAYED.add(video.hashedId());
   const nextInPlaylist = medias.find((media) => {
-    return !_WISTIA_AUTOPLAYED.includes(media.hashed_id);
+    return !_WISTIA_AUTOPLAYED.has(media.hashed_id);
   });
 
   if (!nextInPlaylist) {
     return;
   }
 
+  const endTime = video.duration();
   video.addToPlaylist(nextInPlaylist.hashed_id);
 
   video.bind('crosstime', endTime, () => {

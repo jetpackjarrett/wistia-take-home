@@ -27,6 +27,10 @@ header {
   margin-bottom: 12px;
 }
 
+.media.played {
+  opacity: 0.5;
+}
+
 .media-content {
   display: flex;
   align-items: center;
@@ -82,19 +86,4 @@ header {
 
 .thumbnail {
   height: 56px;
-}
-
-.medias {
-  border: 1px solid red;
-  display: flex;
-  flex-direction: column;
-}
-
-.medias li {
-  order: 1;
-}
-
-.medias .played {
-  order: 2;
-  opacity: 0.5;
 }

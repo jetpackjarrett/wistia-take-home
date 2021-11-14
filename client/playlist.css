@@ -62,7 +62,7 @@ header {
   height: 56px;
 }
 
-.currently-played .thumbnail-container::before {
+.currently-playing .thumbnail-container::before {
   background-color: rgba(0, 0, 0, 0.5);
   position: absolute;
   top: 0;
@@ -80,10 +80,21 @@ header {
   height: 56px;
 }
 
-.played {
-  opacity: 0.5;
-}
-
 .thumbnail {
   height: 56px;
+}
+
+.medias {
+  border: 1px solid red;
+  display: flex;
+  flex-direction: column;
+}
+
+.medias li {
+  order: 1;
+}
+
+.medias .played {
+  order: 2;
+  opacity: 0.5;
 }

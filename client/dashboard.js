@@ -1,35 +1,46 @@
 'use strict';
 
-var Dashboard = {
-  getMedias: function() {
-    var url = new URL('https://api.wistia.com/v1/medias.json');
+import { TOKEN, formatTime } from './common.js';
+
+const Dashboard = {
+  fetchMedias() {
+    const url = new URL('https://api.wistia.com/v1/medias.json');
     url.searchParams.set('api_password', TOKEN);
-    return axios.get(String(url));
+    return fetch(String(url))
+      .then((res) => {
+        if (res.ok) {
+          return res.json();
+        }
+      })
+      .then((json) => {
+        this.medias = json;
+        return this.medias;
+      });
   },
 
-  renderTag: function(mediaEl, tag) {
-    var template = document.getElementById('tag-template');
-    var clone = template.content.cloneNode(true);
-    var tagEl = clone.children[0];
+  renderTag(mediaEl, tag) {
+    const template = document.getElementById('tag-template');
+    const clone = template.content.cloneNode(true);
+    const tagEl = clone.children[0];
 
     tagEl.innerText = tag;
     mediaEl.querySelector('.tags').append(tagEl);
   },
 
-  renderTags: function(mediaEl, tags) {
-    tags.forEach(function(tag) {
+  renderTags(mediaEl, tags) {
+    tags.forEach((tag) => {
       Dashboard.renderTag(mediaEl, tag);
     });
   },
 
-  renderMedia: function(media) {
-    var template = document.getElementById('media-template');
-    var clone = template.content.cloneNode(true);
-    var el = clone.children[0];
+  renderMedia(media) {
+    const template = document.getElementById('media-template');
+    const clone = template.content.cloneNode(true);
+    const el = clone.children[0];
 
     el.querySelector('.thumbnail').setAttribute('src', media.thumbnail.url);
     el.querySelector('.title').innerText = media.name;
-    el.querySelector('.duration').innerText = Utils.formatTime(media.duration);
+    el.querySelector('.duration').innerText = formatTime(media.duration);
     el.querySelector('.count').innerText = '?';
     el.setAttribute('data-hashed-id', media.hashed_id);
 
@@ -38,28 +49,27 @@ var Dashboard = {
     document.getElementById('medias').appendChild(el);
   },
 
-  openModal: function() {
+  openModal() {
     document.querySelector('.modal').classList.add('modal--open');
   },
 
-  closeModal: function() {
+  closeModal() {
     document.querySelector('.modal').classList.remove('modal--open');
   },
 
-  addTag: function() {
-    var el = document.createElement('li');
+  addTag() {
+    const el = document.createElement('li');
     el.querySelector('.tags').appendChild(el);
-  }
+  },
 };
 
-(function() {
+(function () {
   document.addEventListener(
     'DOMContentLoaded',
-    function() {
-      Dashboard.getMedias().then(function(response) {
-        response.data.map(function(media) {
-          Dashboard.renderMedia(media);
-        });
+    async function () {
+      const medias = await Dashboard.fetchMedias();
+      medias.map((media) => {
+        Dashboard.renderMedia(media);
       });
     },
     { useCapture: false }
@@ -67,7 +77,7 @@ var Dashboard = {
 
   document.addEventListener(
     'click',
-    function(event) {
+    function (event) {
       if (event && event.target.matches('.visibility-toggle')) {
         /* toggle visibility */
       }

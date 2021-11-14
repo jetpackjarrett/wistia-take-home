@@ -69,3 +69,52 @@ Given a longer timeline or scale, there are a few things I'd focus on:
    Set is also long. A more performant approach could be to remove a played video
    from an array and find the "next" one by popping off the first item. I find the
    approach I implemented easier to reason about so I stuck with it.
+
+## Search by tag
+
+This presumes Postgres syntax.
+
+_Disclaimer: I haven't written SQL in a couple years so please excuse any clunkiness._
+
+### Tags Schema
+
+Structurally, I'd use a many-to-many relation table to link tags to videos.
+
+```
+CREATE TABLE videos (
+  id  SERIAL PRIMARY KEY,
+  name CHAR(50),
+  description TEXT,
+  play_count INTEGER,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+CREATE TABLE tags (
+  id  SERIAL PRIMARY KEY,
+  name CHAR(50)
+);
+
+CREATE TABLE videos_tags (
+  id  SERIAL PRIMARY KEY,
+  video_id INTEGER REFERENCES videos (id),
+  tag_id INTEGER REFERENCES tags (id)
+);
+```
+
+### Query for videos with at least 1 play count
+
+```
+SELECT COUNT(id) FROM videos WHERE play_count > 0
+```
+
+### Querying videos with tags
+
+```
+SELECT v.*,COUNT(t.id) as tag_count
+FROM videos_tags vt, videos v, tags t
+WHERE vt.tag_id = t.id
+AND v.id = vt.video_id
+GROUP BY v.id
+ORDER BY tag_count DESC, created_at DESC
+LIMIT 1;
+```

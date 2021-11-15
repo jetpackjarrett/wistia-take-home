@@ -22,3 +22,12 @@ export const formatTime = (total) => {
 // READ-ONLY TOKEN
 export const TOKEN =
   'be21195231d946b680453e48456d6e806a34c0456b8c13804aa797cb2c560db1';
+
+export function fetchMedias() {
+  const url = '/medias?api_password=' + TOKEN;
+  return fetch(url).then((res) => {
+    if (res.ok) {
+      return res.json();
+    }
+  });
+}

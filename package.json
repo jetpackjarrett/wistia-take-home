@@ -1,0 +1,14 @@
+{
+  "type": "module",
+  "scripts": {
+    "start": "node ./server/index.js"
+  },
+  "dependencies": {
+    "koa": "^2.13.4",
+    "koa-router": "^10.1.1",
+    "koa-static": "^5.0.0",
+    "node-fetch": "^3.1.0",
+    "sqlite": "^4.0.23",
+    "sqlite3": "^5.0.2"
+  }
+}

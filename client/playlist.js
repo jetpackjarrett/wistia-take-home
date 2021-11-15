@@ -1,6 +1,6 @@
 'use strict';
 
-import { TOKEN, formatTime } from './common.js';
+import { TOKEN, formatTime, fetchMedias } from './common.js';
 
 class Playlist {
   constructor() {
@@ -8,18 +8,10 @@ class Playlist {
   }
 
   fetchMedias() {
-    const url = new URL('https://api.wistia.com/v1/medias.json');
-    url.searchParams.set('api_password', TOKEN);
-    return fetch(String(url))
-      .then((res) => {
-        if (res.ok) {
-          return res.json();
-        }
-      })
-      .then((json) => {
-        this.medias = json;
-        return this.medias;
-      });
+    return fetchMedias().then((json) => {
+      this.medias = json;
+      return this.medias;
+    });
   }
 
   renderMedias() {

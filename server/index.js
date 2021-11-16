@@ -8,6 +8,8 @@ import { database } from './db.js';
 const app = new Koa();
 const router = new Router();
 
+const doSomeVeryRealInputSanitization = (input) => input;
+
 async function start() {
   const db = await database();
 
@@ -22,9 +24,35 @@ async function start() {
     const apiResults = await fetch(String(url)).then((res) => res.json());
     const hashedIds = apiResults.map((res) => `'${res.hashed_id}'`).join(',');
     const dbResults = await db.get(
-      `SELECT * FROM media_visibility WHERE media_id IN (${hashedIds})`
+      `SELECT * FROM hidden_medias WHERE media_id IN (${hashedIds})`
     );
     ctx.body = apiResults;
+  });
+
+  router.get('/medias/:id/hide', async (ctx) => {
+    const mediaId = doSomeVeryRealInputSanitization(ctx.params.id);
+    try {
+      await db.run(
+        `INSERT OR IGNORE INTO hidden_medias (media_id) VALUES ('${id}');`
+      );
+      ctx.status = 200;
+      return;
+    } catch {
+      ctx.status = 500;
+      return;
+    }
+  });
+  router.get('/medias/:id/unhide', async (ctx) => {
+    const { id } = ctx.params;
+    const mediaId = doSomeVeryRealInputSanitization(ctx.params.id);
+    try {
+      await db.run(`DELETE FROM hidden_medias WHERE media_id = '${mediaId}';`);
+      ctx.status = 200;
+      return;
+    } catch {
+      ctx.status = 500;
+      return;
+    }
   });
 
   app.use(router.routes());

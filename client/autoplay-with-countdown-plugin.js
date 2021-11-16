@@ -14,14 +14,13 @@ function highlightCurrent(video) {
   }
 }
 
-_WISTIA_AUTOPLAYED = new Set();
+window._WISTIA_AUTOPLAYED = window._WISTIA_AUTOPLAYED || new Set();
 
 Wistia.plugin('autoplay-with-countdown', (video, { medias, from }) => {
   highlightCurrent(video);
-
-  _WISTIA_AUTOPLAYED.add(video.hashedId());
+  window._WISTIA_AUTOPLAYED.add(video.hashedId());
   const nextInPlaylist = medias.find((media) => {
-    return !_WISTIA_AUTOPLAYED.has(media.hashed_id);
+    return !window._WISTIA_AUTOPLAYED.has(media.hashed_id);
   });
 
   if (!nextInPlaylist) {

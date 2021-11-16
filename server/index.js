@@ -54,7 +54,6 @@ async function start() {
     }
   });
   router.put('/medias/:id/unhide', async (ctx) => {
-    const { id } = ctx.params;
     const mediaId = doSomeVeryRealInputSanitization(ctx.params.id);
     try {
       await db.run(`DELETE FROM hidden_medias WHERE media_id = '${mediaId}';`);

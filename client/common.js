@@ -40,7 +40,7 @@ export function toggleMediaVisibility(id, hide = true) {
     method: 'PUT',
   }).then((res) => {
     if (res.ok) {
-      return res.body();
+      return res.text();
     }
 
     throw new Error('Unable to toggle media');

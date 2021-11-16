@@ -72,7 +72,8 @@ const Dashboard = {
         try {
           container.setAttribute('data-is-hidden', !hidden);
           await toggleMediaVisibility(hashedId, !hidden);
-        } catch {
+        } catch (err) {
+          console.error(err);
           container.setAttribute('data-is-hidden', hidden);
           alert('Unable to update the media');
         }

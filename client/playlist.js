@@ -1,6 +1,6 @@
 'use strict';
 
-import { TOKEN, formatTime, fetchMedias } from './common.js';
+import { formatTime, fetchMedias } from './common.js';
 
 class Playlist {
   constructor() {
@@ -9,7 +9,9 @@ class Playlist {
 
   fetchMedias() {
     return fetchMedias().then((json) => {
-      this.medias = json;
+      this.medias = json.filter((media) => {
+        return !media.hidden;
+      });
       return this.medias;
     });
   }

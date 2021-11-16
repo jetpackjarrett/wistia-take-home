@@ -23,33 +23,46 @@ async function start() {
     url.searchParams.set('api_password', ctx.query.api_password);
     const apiResults = await fetch(String(url)).then((res) => res.json());
     const hashedIds = apiResults.map((res) => `'${res.hashed_id}'`).join(',');
-    const dbResults = await db.get(
-      `SELECT * FROM hidden_medias WHERE media_id IN (${hashedIds})`
-    );
-    ctx.body = apiResults;
+    const hiddenMedias = await db
+      .all(`SELECT * FROM hidden_medias WHERE media_id IN (${hashedIds})`)
+      .then((res) => {
+        return res.map((row) => row.media_id);
+      });
+
+    const results = apiResults.map((result) => {
+      return {
+        ...result,
+        hidden: hiddenMedias.includes(result.hashed_id),
+      };
+    });
+
+    ctx.body = results;
   });
 
-  router.get('/medias/:id/hide', async (ctx) => {
+  router.put('/medias/:id/hide', async (ctx) => {
     const mediaId = doSomeVeryRealInputSanitization(ctx.params.id);
     try {
       await db.run(
-        `INSERT OR IGNORE INTO hidden_medias (media_id) VALUES ('${id}');`
+        `INSERT OR IGNORE INTO hidden_medias (media_id) VALUES ('${mediaId}');`
       );
       ctx.status = 200;
       return;
-    } catch {
+    } catch (err) {
+      console.error(err);
       ctx.status = 500;
       return;
     }
   });
-  router.get('/medias/:id/unhide', async (ctx) => {
+  router.put('/medias/:id/unhide', async (ctx) => {
     const { id } = ctx.params;
     const mediaId = doSomeVeryRealInputSanitization(ctx.params.id);
     try {
+      throw new Error('oh no');
       await db.run(`DELETE FROM hidden_medias WHERE media_id = '${mediaId}';`);
       ctx.status = 200;
       return;
-    } catch {
+    } catch (err) {
+      console.error(err);
       ctx.status = 500;
       return;
     }

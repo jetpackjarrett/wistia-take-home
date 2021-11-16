@@ -1,6 +1,6 @@
 'use strict';
 
-import { fetchMedias, formatTime } from './common.js';
+import { fetchMedias, toggleMediaVisibility, formatTime } from './common.js';
 
 const Dashboard = {
   renderTag(mediaEl, tag) {
@@ -28,6 +28,7 @@ const Dashboard = {
     el.querySelector('.duration').innerText = formatTime(media.duration);
     el.querySelector('.count').innerText = '?';
     el.setAttribute('data-hashed-id', media.hashed_id);
+    el.setAttribute('data-is-hidden', media.hidden);
 
     this.renderTags(el, ['tag-1', 'tag-2']);
 
@@ -62,9 +63,19 @@ const Dashboard = {
 
   document.addEventListener(
     'click',
-    function (event) {
+    async function (event) {
       if (event && event.target.matches('.visibility-toggle')) {
-        /* toggle visibility */
+        const container = event.target.closest('li');
+        const { hashedId, isHidden } = container.dataset;
+        const hidden = isHidden === 'true';
+        // Optimistic update the toggle, then revert if it fails
+        try {
+          container.setAttribute('data-is-hidden', !hidden);
+          await toggleMediaVisibility(hashedId, !hidden);
+        } catch {
+          container.setAttribute('data-is-hidden', hidden);
+          alert('Unable to update the media');
+        }
       }
 
       if (event && event.target.matches('.tag-button')) {

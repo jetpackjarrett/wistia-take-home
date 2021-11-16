@@ -29,5 +29,20 @@ export function fetchMedias() {
     if (res.ok) {
       return res.json();
     }
+
+    throw new Error('Unable to fetch media');
+  });
+}
+
+export function toggleMediaVisibility(id, hide = true) {
+  const action = hide ? 'hide' : 'unhide';
+  return fetch(`/medias/${id}/${action}`, {
+    method: 'PUT',
+  }).then((res) => {
+    if (res.ok) {
+      return res.body();
+    }
+
+    throw new Error('Unable to toggle media');
   });
 }

@@ -57,7 +57,6 @@ async function start() {
     const { id } = ctx.params;
     const mediaId = doSomeVeryRealInputSanitization(ctx.params.id);
     try {
-      throw new Error('oh no');
       await db.run(`DELETE FROM hidden_medias WHERE media_id = '${mediaId}';`);
       ctx.status = 200;
       return;
